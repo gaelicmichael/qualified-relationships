@@ -1,5 +1,15 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+This project contains experiments visualizing “Qualified Relationships,” as I defined them in the [Prospect](https://github.com/Digital-Innovation-Lab/prospect) Digital Humanities collaboratory. The idea is that QRs express relationships between two entities that are conditioned by:
+- the type of relationship,
+- the roles of each entity in the relationship,
+- the time period during which the relationship was active.
+
+This project utilizes the following packages and libraries:
+- ReactJS framework
+- Material-UI for GUI elements and style
+- VX for React-compatible data visualization
+
 ## Available Scripts
 
 In the project directory, you can run:
