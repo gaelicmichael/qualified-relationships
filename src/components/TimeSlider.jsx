@@ -1,24 +1,27 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Slider from '@material-ui/core/Slider';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 
+import { TimeContext } from '../TimeConstraintsContext';
 
 function displayTimeVal(value) {
   return `${value}°C`;
 }
 
-function TimeSlider({ classes, timeParams }) {
-  const [active, setActive] = useState(false);
-  const [timeVal, setTimeVal] = useState(timeParams.default);
+// INPUT: classes is object with CSS classes
+//        timeParams is object with start, end, step, default
+//        callback takes (active, timeVal)
+function TimeSlider({ classes }) {
+  const [state, dispatch] = useContext(TimeContext);
 
-  function handleClick(event) {
-    setActive(event.target.checked)
+  function setActive(event) {
+    dispatch({ type: 'SET_ACTIVE', payload: event.target.checked });
   }
 
-  function changeTime(event, newTime) {
-    setTimeVal(newTime)
+  function setCurrent(event, newValue) {
+    dispatch({ type: 'SET_CURRENT', payload: newValue });
   }
 
   return (
@@ -26,15 +29,15 @@ function TimeSlider({ classes, timeParams }) {
       <Grid item xs={3}>
         <FormControlLabel
           control={
-            <Switch checked={active} onChange={handleClick} name="timeSliderOn" color="primary" />
+            <Switch checked={state.active} onChange={setActive} name="timeSliderOn" color="primary" />
           }
           label="Limit By Time"
         />
       </Grid>
       <Grid item xs={9}>
-        <Slider value={timeVal} defaultValue={timeParams.default}
-            min={timeParams.start} max={timeParams.end}
-            step={timeParams.step} marks valueLabelDisplay="auto" onChange={changeTime}
+        <Slider value={state.current} defaultValue={state.initial}
+            min={state.start} max={state.end}
+            step={state.step} marks valueLabelDisplay="auto" onChange={setCurrent}
             getAriaValueText={displayTimeVal} aria-labelledby="discrete-slider-small-steps"
         />
       </Grid>

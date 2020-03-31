@@ -43,11 +43,11 @@ function QRManager(entities, relationDefs, relations) {
     }, // getEntityLabel()
 
     // RETURN: array of { id, label }
-    getEntities: function(timeConstraint) {
+    getEntities: function(apply, timeVal) {
       return entities;
     }, // getEntities()
 
-    getRelations: function(timeConstraint) {
+    getRelations: function(apply, timeVal) {
       return relations;
     },
 

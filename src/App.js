@@ -1,3 +1,5 @@
+// NOTES: Technique of using reducer with Context from https://www.sitepoint.com/replace-redux-react-hooks-context-api/
+
 import React, { useState } from 'react';
 import { makeStyles, createMuiTheme } from '@material-ui/core/styles';
 import ThemeProvider from '@material-ui/styles/ThemeProvider';
@@ -13,6 +15,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 
 //===============================
 // Components defined by this App
+import { TimeContextProvider } from './TimeConstraintsContext';
 import QRManager from './relationships/QRManager';
 import { dataEntities, dataRelationDefs, dataRelations } from './relationships/dataset';
 import ListView from './components/ListView.jsx';
@@ -51,13 +54,6 @@ const displayModes = {
   desc: "Description",
   list: "View As List",
   graph: "View As Graph"
-}
-
-const timeParams = {
-  start: 1000,
-  end: 1700,
-  default: 1300,
-  step: 10
 }
 
 const qrManager = QRManager(dataEntities, dataRelationDefs, dataRelations);
@@ -99,43 +95,42 @@ function App() {
   const [displayMode, setDisplayMode] = useState(displayModes.desc);
   const classes = useStyles();
 
-  // Add useState for visible entities and relations, initially empty
-  // Add useEffect for creating default settings
-
   return (
     <ThemeProvider theme={darkTheme}>
-    <div className={classes.root}>
-      <CssBaseline />
-      <AppBar position="fixed" className={classes.appBar}>
-        <Toolbar>
-          <Typography variant="h6" noWrap>
-            Qualified Relationship Viewer
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer className={classes.drawer} variant="permanent" classes={{ paper: classes.drawerPaper }} >
-        <div className={classes.toolbar} />
-        <List>
-          <ListItem button selected={displayMode === displayModes.desc} onClick={() => setDisplayMode(displayModes.desc)}>
-            <ListItemText primary={displayModes.desc} />
-          </ListItem>
-          <ListItem button selected={displayMode === displayModes.list} onClick={() => setDisplayMode(displayModes.list)}>
-            <ListItemText primary={displayModes.list} />
-          </ListItem>
-          <ListItem button selected={displayMode === displayModes.graph} onClick={() => setDisplayMode(displayModes.graph)}>
-            <ListItemText primary={displayModes.graph} />
-          </ListItem>
-        </List>
-      </Drawer>
-      <main className={classes.content}>
-        <div className={classes.toolbar} />
-        {{ 
-           [displayModes.desc]: descriptionText(),
-           [displayModes.list]: <ListView inheritClasses={classes} timeParams={timeParams} qrManager={qrManager} />,
-           [displayModes.graph]: <div>Graph</div>,
-         }[displayMode]}
-      </main>
-    </div>
+      <TimeContextProvider>
+        <div className={classes.root}>
+          <CssBaseline />
+          <AppBar position="fixed" className={classes.appBar}>
+            <Toolbar>
+              <Typography variant="h6" noWrap>
+                Qualified Relationship Viewer
+              </Typography>
+            </Toolbar>
+          </AppBar>
+          <Drawer className={classes.drawer} variant="permanent" classes={{ paper: classes.drawerPaper }} >
+            <div className={classes.toolbar} />
+            <List>
+              <ListItem button selected={displayMode === displayModes.desc} onClick={() => setDisplayMode(displayModes.desc)}>
+                <ListItemText primary={displayModes.desc} />
+              </ListItem>
+              <ListItem button selected={displayMode === displayModes.list} onClick={() => setDisplayMode(displayModes.list)}>
+                <ListItemText primary={displayModes.list} />
+              </ListItem>
+              <ListItem button selected={displayMode === displayModes.graph} onClick={() => setDisplayMode(displayModes.graph)}>
+                <ListItemText primary={displayModes.graph} />
+              </ListItem>
+            </List>
+          </Drawer>
+          <main className={classes.content}>
+            <div className={classes.toolbar} />
+            {{ 
+              [displayModes.desc]: descriptionText(),
+              [displayModes.list]: <ListView inheritClasses={classes} qrManager={qrManager} />,
+              [displayModes.graph]: <div>Graph</div>,
+            }[displayMode]}
+          </main>
+        </div>
+      </TimeContextProvider>
     </ThemeProvider>
   );
 }
