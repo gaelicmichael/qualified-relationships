@@ -18,6 +18,15 @@ export const dataEntities = [
   { id:  15, label: 'Eòin MacDomhnuill', type: 'Person', start: 1320, end: 1386 },
 ]
 
+export const entityDefs = {
+  Institution: {
+    color: 'purple'
+  },
+  Person: {
+    color: 'pink'
+  }
+}
+
 export const dataRelationDefs = {
   descent: {
     label: 'Descent',

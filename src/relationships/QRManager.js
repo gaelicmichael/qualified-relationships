@@ -27,7 +27,7 @@
  ***    end: Number
  ***/
 
-function QRManager(entities, relationDefs, relations) {
+function QRManager(entityDefs, entities, relationDefs, relations) {
 
   function fetchEntityLabel(id) {
     let e = entities.find(e => e.id === id)

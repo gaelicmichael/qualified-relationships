@@ -18,8 +18,10 @@ import ListItemText from '@material-ui/core/ListItemText';
 // Components defined by this App
 import { TimeContextProvider } from './TimeConstraintsContext';
 import QRManager from './relationships/QRManager';
-import { dataEntities, dataRelationDefs, dataRelations, dataTimeSettings } from './relationships/dataset';
+import { dataEntities, entityDefs, dataRelationDefs, dataRelations, dataTimeSettings } from './relationships/dataset';
 import ListView from './components/ListView.jsx';
+import EgoTimeRadar from './components/EgoTimeRadar.jsx';
+
 
 const drawerWidth = 170;
 
@@ -54,10 +56,10 @@ const darkTheme = createMuiTheme({
 const displayModes = {
   desc: "Description",
   list: "View As List",
-  graph: "View As Graph"
+  egoTimeRadar: "View As Ego Time Radar"
 }
 
-const qrManager = QRManager(dataEntities, dataRelationDefs, dataRelations);
+const qrManager = QRManager(entityDefs, dataEntities, dataRelationDefs, dataRelations);
 
 function descriptionText() {
   return <React.Fragment>
@@ -117,8 +119,8 @@ function App() {
               <ListItem button selected={displayMode === displayModes.list} onClick={() => setDisplayMode(displayModes.list)}>
                 <ListItemText primary={displayModes.list} />
               </ListItem>
-              <ListItem button selected={displayMode === displayModes.graph} onClick={() => setDisplayMode(displayModes.graph)}>
-                <ListItemText primary={displayModes.graph} />
+              <ListItem button selected={displayMode === displayModes.egoTimeRadar} onClick={() => setDisplayMode(displayModes.egoTimeRadar)}>
+                <ListItemText primary={displayModes.egoTimeRadar} />
               </ListItem>
             </List>
           </Drawer>
@@ -127,7 +129,7 @@ function App() {
             {{ 
               [displayModes.desc]: descriptionText(),
               [displayModes.list]: <ListView inheritClasses={classes} qrManager={qrManager} />,
-              [displayModes.graph]: <div>Graph</div>,
+              [displayModes.egoTimeRadar]: <EgoTimeRadar inheritClasses={classes} qrManager={qrManager} />,
             }[displayMode]}
           </main>
         </div>
