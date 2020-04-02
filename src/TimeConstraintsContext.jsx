@@ -1,14 +1,5 @@
 import React, { useReducer, createContext } from "react";
 
-const initialState = {
-  start: 1000,
-  end: 1700,
-  step: 10,
-  initial: 1300,
-  active: false,
-  current: 1300,
-};
-
 export const TimeContext = createContext();
 
 const reducer = (state, action) => {
@@ -22,8 +13,8 @@ const reducer = (state, action) => {
   }
 }
 
-export const TimeContextProvider = props => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+export function TimeContextProvider(props) {
+  const [state, dispatch] = useReducer(reducer, props.initialState);
 
   return (
     <TimeContext.Provider value={[state, dispatch]}>

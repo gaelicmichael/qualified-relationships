@@ -11,14 +11,9 @@
  ***  relationDefs: object of
  ***    [id]: {
  ***      label: String
- ***      types: object of {
- ***        [id]: {
- ***          label: String,
- ***          color: String,
- ***          roles: [ String ]
- ***          roleColors: [ String ]
- ***        }
- ***      }
+ ***      color: String
+ ***      roles: [ String ]
+ ***      roleColors: [ String ]
  ***    }
  ***
  ***  relations: array of
@@ -37,7 +32,7 @@ function QRManager(entities, relationDefs, relations) {
   function fetchEntityLabel(id) {
     let e = entities.find(e => e.id === id)
     return e ? e.label : ''
-}
+  }
 
   return {
     getEntityLabel: function(id) {

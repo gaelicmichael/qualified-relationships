@@ -18,7 +18,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 // Components defined by this App
 import { TimeContextProvider } from './TimeConstraintsContext';
 import QRManager from './relationships/QRManager';
-import { dataEntities, dataRelationDefs, dataRelations } from './relationships/dataset';
+import { dataEntities, dataRelationDefs, dataRelations, dataTimeSettings } from './relationships/dataset';
 import ListView from './components/ListView.jsx';
 
 const drawerWidth = 170;
@@ -98,7 +98,7 @@ function App() {
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <TimeContextProvider>
+      <TimeContextProvider initialState={dataTimeSettings}>
         <div className={classes.root}>
           <CssBaseline />
           <AppBar position="fixed" className={classes.appBar}>

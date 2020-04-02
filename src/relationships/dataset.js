@@ -1,3 +1,12 @@
+export const dataTimeSettings = {
+  start: 1000,
+  end: 1700,
+  step: 10,
+  initial: 1300,
+  active: false,
+  current: 1300,
+}
+
 export const dataEntities = [
   { id:   1, label: 'Kingdom of Scotland', type: 'Institution', start: 1000, end: 2020 },
   { id:   3, label: 'Clann Domhnaill', type: 'Institution', start: 1150, end: 2020 },
