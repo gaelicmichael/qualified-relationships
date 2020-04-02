@@ -28,6 +28,8 @@
  ***    role2: String
  ***    id1: String
  ***    id2: String
+ ***    start: Number
+ ***    end: Number
  ***/
 
 function QRManager(entities, relationDefs, relations) {
@@ -44,11 +46,17 @@ function QRManager(entities, relationDefs, relations) {
 
     // RETURN: array of { id, label }
     getEntities: function(apply, timeVal) {
-      return entities;
+      if (!apply) {
+        return entities;
+      }
+      return entities.filter(e => e.start <= timeVal && timeVal <= e.end)
     }, // getEntities()
 
     getRelations: function(apply, timeVal) {
-      return relations;
+      if (!apply) {
+        return relations;
+      }
+      return relations.filter(r => r.start <= timeVal && timeVal <= r.end)
     },
 
     // RETURN: object with expanded fields:

@@ -1,7 +1,7 @@
 import React, { useReducer, createContext } from "react";
 
 const initialState = {
-  start: 1200,
+  start: 1000,
   end: 1700,
   step: 10,
   initial: 1300,

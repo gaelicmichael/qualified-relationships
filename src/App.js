@@ -1,4 +1,5 @@
 // NOTES: Technique of using reducer with Context from https://www.sitepoint.com/replace-redux-react-hooks-context-api/
+// See also https://medium.com/simply/state-management-with-react-hooks-and-context-api-at-10-lines-of-code-baf6be8302c
 
 import React, { useState } from 'react';
 import { makeStyles, createMuiTheme } from '@material-ui/core/styles';
