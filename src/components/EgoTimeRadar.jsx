@@ -2,7 +2,6 @@
 //    Create Relationship type filter
 //    Use actual data for times, colors, etc
 //    Overlay of time rings with labels
-//    Reset all selection (and redraw) if time slider moved
 
 import React, { Fragment, useState, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
@@ -96,12 +95,28 @@ function EgoTimeRadar(props) {
   const radarClasses = useStyles();
   const [state] = useContext(TimeContext);
 
-  const visibleEntities = qrManager.getEntities(state.active, state.current);
   const [selectedID, setSelectedID] = useState(null);
+  const visibleEntities = qrManager.getEntities(state.active, state.current);
+
+  // As Time Slider may have made last selection invisible, check that it is still available
+  if (selectedID !== null && state.active) {
+    let appears = false;
+    for (let i=0; i<visibleEntities.length; i++) {
+      let thisEntity = visibleEntities[i];
+      if (thisEntity.id === selectedID) {
+        appears = true;
+        break;
+      }
+    }
+    if (!appears) {
+      setSelectedID(null);
+    }
+  }
 
   // const radius = Math.min(pixWidth, pixHeight) / 2;
   const centerY = pixHeight / 2;
   const centerX = pixWidth / 2;
+
 
   function mouseOverRelation(event, datum) {
     const coords = localPoint(event.target.ownerSVGElement, event);
@@ -109,7 +124,6 @@ function EgoTimeRadar(props) {
   }
 
   function clickEntityBtn(entity) {
-    console.log("Clicked on ", entity.label);
     setSelectedID(entity.id);
   }
 
