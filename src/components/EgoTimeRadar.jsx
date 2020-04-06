@@ -1,5 +1,11 @@
-// TODO
-//    Create Relationship type filter
+/***
+ * EgoTimeRadar -- User chooses an entity, all relationships with that entity
+ *    are displayed over time.
+ * 
+ * TODO
+ *    Put entities into a scrolling list
+ *    Create Relationship type filter
+ */
 
 import React, { Fragment, useState, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
@@ -43,6 +49,8 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonColumn: {
     width: buttonWidth,
+    maxHeight: `${pixHeight}px`,
+    overflowY: 'scroll',
     fontSize: '10px',
     flexShrink: 0,
     margin: theme.spacing(0),
@@ -54,10 +62,10 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '10px',
     padding: theme.spacing(1),
   },
-  content: {
+  graph: {
     flexGrow: 1,
     padding: theme.spacing(0),
-    margin: theme.spacing(1),
+    margin: theme.spacing(0),
   },
   tooltip: {
     backgroundColor: 'black',
@@ -120,7 +128,6 @@ function EgoTimeRadar(props) {
     let { start, end } = selectedEntity;
     timeScale = scaleLinear({ domain: [start, end], range: [startRadius, endRadius] });
     relations = qrManager.getEntityRelations(selectedEntity, true);
-console.log("Relations ", relations);
   }
 
   function mouseOverRelation(event, datum) {
@@ -138,18 +145,20 @@ console.log("Relations ", relations);
       <TimeSlider classes={inheritClasses} />
 
       <div className={radarClasses.outerWrapper}>
-        <ButtonGroup orientation="vertical" color="primary" aria-label="vertical contained primary button group small"
-          variant="contained" className={radarClasses.buttonColumn}>
-            { visibleEntities.map((e) => (
-              <Button className={radarClasses.button} key={e.id}
-                  variant={selectedEntity === e ? "outlined" : ""}
-                  onClick={() => clickEntityBtn(e)}
-              >
-                { e.label }
-              </Button>
-            ))};
-        </ButtonGroup>
-        <main className={radarClasses.content}>
+        <div className={radarClasses.buttonColumn}>
+          <ButtonGroup orientation="vertical" color="primary" aria-label="vertical contained primary button group small"
+            variant="contained" >
+              { visibleEntities.map((e) => (
+                <Button className={radarClasses.button} key={e.id}
+                    variant={selectedEntity === e ? "outlined" : ""}
+                    onClick={() => clickEntityBtn(e)}
+                >
+                  { e.label }
+                </Button>
+              ))};
+          </ButtonGroup>
+        </div>
+        <main className={radarClasses.graph}>
           <svg width={pixWidth} height={pixHeight}>
             <rect rx={10} width={pixWidth} height={pixHeight} fill={grey} />
             <Group top={centerY} left={centerX}>
