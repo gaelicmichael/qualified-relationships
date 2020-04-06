@@ -29,8 +29,8 @@ const centerX = pixWidth / 2;
 const startRadius = 10;   // pixel start of circles (min-time)
 const endRadius = ((pixWidth / 2) - 10);  // pixel end of circles (max-time)
 
-const white = '#ffffff';
-const grey = '#777777';
+// const white = '#ffffff';
+const grey = '#999999';
 const black = '#000000';
 
 const useStyles = makeStyles((theme) => ({
