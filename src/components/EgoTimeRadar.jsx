@@ -1,7 +1,5 @@
 // TODO
 //    Create Relationship type filter
-//    Use actual data for times, colors, etc
-//    Overlay of time rings with labels
 
 import React, { Fragment, useState, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
@@ -11,21 +9,25 @@ import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 
 // VX
+import { localPoint } from '@vx/event';
+import { scaleLinear } from '@vx/scale';
 import { Pie } from '@vx/shape';
 import { Group } from '@vx/group';
 import { withTooltip, Tooltip } from '@vx/tooltip';
-import { localPoint } from '@vx/event';
-
 
 // App-specific components
 import TimeSlider from './TimeSlider'
 import { TimeContext } from '../TimeConstraintsContext';
 
+const buttonWidth = 200;  // Pixel width of button column (with entity names)
+
 const pixWidth = 600;
 const pixHeight = 600;
+const centerY = pixHeight / 2;
+const centerX = pixWidth / 2;
 
-const buttonWidth = 200;
-
+const startRadius = 10;   // pixel start of circles (min-time)
+const endRadius = ((pixWidth / 2) - 10);  // pixel end of circles (max-time)
 
 const white = '#ffffff';
 const grey = '#777777';
@@ -64,21 +66,11 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 12,
     boxShadow: '0 4px 8px 0 rgba(25, 29, 34, 0.1)',
     pointerEvents: 'none',
+    maxWidth: '250px',
     borderRadius: 3,
     border: '2px solid rgba(25, 29, 34, 0.12)',
   },
 }));
-
-const dummyData = [
-  { label: 'A', value: 100, inner:  20, outer: 60 },
-  { label: 'B', value:  25, inner: 100, outer: 200 },
-  { label: 'C', value:  75, inner:  50, outer: 190 },
-  { label: 'D', value:  30, inner: 110, outer: 160 }
-];
-
-const valueAccessor = d => d.value;
-const outerRadiusAccessor = p => p.data.outer;
-const innerRadiusAccessor = p => p.data.inner;
 
 function EgoTimeRadar(props) {
   const {
@@ -95,36 +87,50 @@ function EgoTimeRadar(props) {
   const radarClasses = useStyles();
   const [state] = useContext(TimeContext);
 
-  const [selectedID, setSelectedID] = useState(null);
+  const [selectedEntity, setSelectedEntity] = useState(null);
+
+  // Get list of entities qualified by time parameters
   const visibleEntities = qrManager.getEntities(state.active, state.current);
 
   // As Time Slider may have made last selection invisible, check that it is still available
-  if (selectedID !== null && state.active) {
+  if (selectedEntity && state.active) {
     let appears = false;
     for (let i=0; i<visibleEntities.length; i++) {
       let thisEntity = visibleEntities[i];
-      if (thisEntity.id === selectedID) {
+      if (thisEntity === selectedEntity) {
         appears = true;
         break;
       }
     }
     if (!appears) {
-      setSelectedID(null);
+      setSelectedEntity(null);
     }
   }
 
-  // const radius = Math.min(pixWidth, pixHeight) / 2;
-  const centerY = pixHeight / 2;
-  const centerX = pixWidth / 2;
+  let timeScale;
+  let relations = [];
 
+  // Translate time values to pixels
+  const outerRadiusAccessor = p => timeScale(p.data.end);
+  const innerRadiusAccessor = p => timeScale(p.data.start);
+
+  // If an entity has been selected, what is it’s time range? Use that to create time rings.
+  // Compile relationship data!
+  if (selectedEntity !== null) {
+    let { start, end } = selectedEntity;
+    timeScale = scaleLinear({ domain: [start, end], range: [startRadius, endRadius] });
+    relations = qrManager.getEntityRelations(selectedEntity, true);
+console.log("Relations ", relations);
+  }
 
   function mouseOverRelation(event, datum) {
     const coords = localPoint(event.target.ownerSVGElement, event);
-    showTooltip({ tooltipLeft: coords.x, tooltipTop: coords.y, tooltipData: { label: datum.label } });
+    const labelStr = `${datum.type}: ${datum.start} - ${datum.end}, ${datum.entity1} (${datum.role1}) and ${datum.entity2} (${datum.role2})`;
+    showTooltip({ tooltipLeft: coords.x, tooltipTop: coords.y, tooltipData: { label: labelStr } });
   }
 
   function clickEntityBtn(entity) {
-    setSelectedID(entity.id);
+    setSelectedEntity(entity);
   }
 
   return (
@@ -136,7 +142,7 @@ function EgoTimeRadar(props) {
           variant="contained" className={radarClasses.buttonColumn}>
             { visibleEntities.map((e) => (
               <Button className={radarClasses.button} key={e.id}
-                  variant={selectedID === e.id ? "outlined" : ""}
+                  variant={selectedEntity === e ? "outlined" : ""}
                   onClick={() => clickEntityBtn(e)}
               >
                 { e.label }
@@ -147,14 +153,15 @@ function EgoTimeRadar(props) {
           <svg width={pixWidth} height={pixHeight}>
             <rect rx={10} width={pixWidth} height={pixHeight} fill={grey} />
             <Group top={centerY} left={centerX}>
-              <Pie data={dummyData} pieValue={valueAccessor} cornerRadius={4} padAngle={0.01}
+              <Pie data={relations} pieValue={10} cornerRadius={4} padAngle={0.01}
                 outerRadius={outerRadiusAccessor} innerRadius={innerRadiusAccessor}
               >
                 {pie => {
                   return pie.arcs.map((arc, i) => {
                     return (
                       <g key={`seg-${arc.data.label}-${i}`}>
-                        <path d={pie.path(arc)} fill={white} fillOpacity={1}
+                        <path d={pie.path(arc)} fill={arc.data.typeColor} fillOpacity={1}
+                          stroke={black} strokeWidth="1"
                           onMouseOver={(event) => mouseOverRelation(event, arc.data)}
                           onMouseOut={hideTooltip}
                         />
@@ -163,6 +170,17 @@ function EgoTimeRadar(props) {
                   });
                 }}
               </Pie>
+              {timeScale && timeScale.ticks().map((tick, i) => {
+                const r = timeScale(tick);
+                return (
+                  <g key={`time-ring-${i}`}>
+                    <circle r={r} stroke={black} strokeWidth="2" fill="none" fillOpacity={0.8} strokeOpacity={0.2} />
+                    <text y={-r} dy={'-.33em'} fontSize={8} fill={black} fillOpacity={0.8} textAnchor="middle">
+                      {tick}
+                    </text>
+                  </g>
+                );
+              })}
             </Group>
           </svg>
         </main>
@@ -171,7 +189,7 @@ function EgoTimeRadar(props) {
       {tooltipOpen && tooltipData && (
         <Tooltip top={tooltipTop} left={tooltipLeft}>
           <div className={radarClasses.tooltip}>
-            { 'The label is ' + tooltipData.label }
+            { tooltipData.label }
           </div>
         </Tooltip>
       )}
