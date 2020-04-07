@@ -3,14 +3,12 @@
  *    are displayed over time.
  * 
  * TODO
- *    Put entities into a scrolling list
- *    Create Relationship type filter
  */
 
 import React, { Fragment, useState, useContext } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 
 // Material-UI
+import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 

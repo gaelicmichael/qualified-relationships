@@ -1,5 +1,13 @@
-// NOTES: Technique of using reducer with Context from https://www.sitepoint.com/replace-redux-react-hooks-context-api/
-// See also https://medium.com/simply/state-management-with-react-hooks-and-context-api-at-10-lines-of-code-baf6be8302c
+/***
+ * Qualified Relationships -- Visualiations
+ *  By Michael Newton April 2020 (drawing on my earlier work in UNC Digital Innovation Lab)
+ * 
+ * NOTES
+ *    Technique of using reducer with Context from https://www.sitepoint.com/replace-redux-react-hooks-context-api/
+ *    See also https://medium.com/simply/state-management-with-react-hooks-and-context-api-at-10-lines-of-code-baf6be8302c
+ * TODO
+ *     Create Relationship type filter
+ *  */
 
 import React, { useState } from 'react';
 
@@ -23,6 +31,7 @@ import QRManager from './relationships/QRManager';
 import { dataEntities, entityDefs, dataRelationDefs, dataRelations, dataTimeSettings } from './relationships/dataset';
 import ListView from './components/ListView.jsx';
 import EgoTimeRadar from './components/EgoTimeRadar.jsx';
+import EgoRings from './components/EgoRings.jsx';
 
 
 const drawerWidth = 170;
@@ -58,7 +67,8 @@ const darkTheme = createMuiTheme({
 const displayModes = {
   desc: "Description",
   list: "View As List",
-  egoTimeRadar: "View As Ego Time Radar"
+  egoTimeRadar: "View As Ego Time Radar",
+  egoRings: "View As Ego Rings"
 }
 
 const qrManager = QRManager(entityDefs, dataEntities, dataRelationDefs, dataRelations);
@@ -124,6 +134,9 @@ function App() {
               <ListItem button selected={displayMode === displayModes.egoTimeRadar} onClick={() => setDisplayMode(displayModes.egoTimeRadar)}>
                 <ListItemText primary={displayModes.egoTimeRadar} />
               </ListItem>
+              <ListItem button selected={displayMode === displayModes.egoRings} onClick={() => setDisplayMode(displayModes.egoRings)}>
+                <ListItemText primary={displayModes.egoRings} />
+              </ListItem>
             </List>
           </Drawer>
           <main className={classes.content}>
@@ -132,6 +145,7 @@ function App() {
               [displayModes.desc]: descriptionText(),
               [displayModes.list]: <ListView inheritClasses={classes} qrManager={qrManager} />,
               [displayModes.egoTimeRadar]: <EgoTimeRadar inheritClasses={classes} qrManager={qrManager} />,
+              [displayModes.egoRings]: <EgoRings inheritClasses={classes} qrManager={qrManager} />,
             }[displayMode]}
           </main>
         </div>
