@@ -120,7 +120,7 @@ function EgoTimeRadar(props) {
   const outerRadiusAccessor = p => timeScale(p.data.end);
   const innerRadiusAccessor = p => timeScale(p.data.start);
 
-  // If an entity has been selected, what is it’s time range? Use that to create time rings.
+  // If an entity has been selected, what is its time range? Use that to create time rings.
   // Compile relationship data!
   if (selectedEntity !== null) {
     let { start, end } = selectedEntity;

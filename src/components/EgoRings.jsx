@@ -22,6 +22,7 @@ import Select from '@material-ui/core/Select';
 // VX
 import { localPoint } from '@vx/event';
 import { scaleLinear } from '@vx/scale';
+// import { Tree } from '@vx/hierarchy';
 // import { Group } from '@vx/group';
 import { withTooltip, Tooltip } from '@vx/tooltip';
 
@@ -31,13 +32,13 @@ import { TimeContext } from '../TimeConstraintsContext';
 
 const buttonWidth = 200;  // Pixel width of button column (with entity names)
 
-const pixWidth = 400;
-const pixHeight = 400;
+const pixWidth = 600;
+const pixHeight = 600;
 const centerY = pixHeight / 2;
 const centerX = pixWidth / 2;
 
-const startRadius = 10;   // pixel start of circles (min-time)
-const endRadius = ((pixWidth / 2) - 10);  // pixel end of circles (max-time)
+const startRadius = 20;   // pixel start of circles (1st ring)
+const endRadius = ((pixWidth / 2) - 20);  // pixel end of circles (last ring)
 
 // const white = '#ffffff';
 const grey = '#999999';
@@ -133,11 +134,11 @@ function EgoRings(props) {
   // Translate time values to pixels
   const radiusAccessor = p => ringScale(p.data.pos);
 
-  // If an entity has been selected, what is it’s time range? Use that to create time rings.
-  // Compile relationship data!
+  // If an entity has been selected, create hierarchical tree centered on it
   if (selectedEntity !== null) {
-    let { start, end } = selectedEntity;
-    ringScale = scaleLinear({ domain: [0, 100], range: [startRadius, endRadius] });
+    ringScale = scaleLinear({ domain: [1, numRings], range: [startRadius, endRadius] });
+    let tree = qrManager.getEntityHierarchy(selectedEntity, numRings, state.active, state.current);
+    console.log("Node hierarchy ", tree);
   }
 
   function mouseOverRelation(event, datum) {

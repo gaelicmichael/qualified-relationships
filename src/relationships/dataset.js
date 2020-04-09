@@ -128,7 +128,6 @@ export const dataRelations = [
   { id:  24, type: 'plays', role1: 'Musician', role2: 'Instrument', entity1: 49, entity2: 5, start: 1951, end: 2020 },
   { id:  25, type: 'plays', role1: 'Musician', role2: 'Instrument', entity1: 50, entity2: 5, start: 1950, end: 2020 },
   { id:  26, type: 'plays', role1: 'Musician', role2: 'Instrument', entity1: 51, entity2: 1, start: 1951, end: 2020 },
-  { id:  27, type: 'plays', role1: 'Musician', role2: 'Instrument', entity1: 52, entity2: 4, start: 1951, end: 2020 },
   { id:  28, type: 'plays', role1: 'Musician', role2: 'Instrument', entity1: 53, entity2: 1, start: 1950, end: 2020 },
   { id:  30, type: 'plays', role1: 'Musician', role2: 'Instrument', entity1: 54, entity2: 1, start: 1946, end: 2020 },
   { id:  31, type: 'plays', role1: 'Musician', role2: 'Instrument', entity1: 55, entity2: 6, start: 1947, end: 2020 },
@@ -194,7 +193,6 @@ export const dataRelations = [
   { id: 152, type: 'membership', role1: 'Band', role2: 'Member', entity1: 11, entity2: 49, start: 1970, end: 2020 },
   { id: 153, type: 'membership', role1: 'Band', role2: 'Member', entity1: 11, entity2: 50, start: 1967, end: 1975 },
   { id: 154, type: 'membership', role1: 'Band', role2: 'Member', entity1: 11, entity2: 51, start: 1967, end: 1970 },
-  { id: 155, type: 'membership', role1: 'Band', role2: 'Member', entity1: 11, entity2: 52, start: 1967, end: 1968 },
   { id: 156, type: 'membership', role1: 'Band', role2: 'Member', entity1: 11, entity2: 53, start: 1971, end: 1977 },
 
   { id: 160, type: 'membership', role1: 'Band', role2: 'Member', entity1: 12, entity2: 54, start: 1968, end: 2020 },
