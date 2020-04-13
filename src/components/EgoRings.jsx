@@ -19,11 +19,16 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
+// D3
+import { hierarchy } from 'd3-hierarchy';
+import { pointRadial } from 'd3-shape';
+
 // VX
 import { localPoint } from '@vx/event';
 import { scaleLinear } from '@vx/scale';
-// import { Tree } from '@vx/hierarchy';
-// import { Group } from '@vx/group';
+import { Tree } from '@vx/hierarchy';
+import { Group } from '@vx/group';
+import { LinkRadialCurve } from '@vx/shape';
 import { withTooltip, Tooltip } from '@vx/tooltip';
 
 // App-specific components
@@ -39,8 +44,9 @@ const centerX = pixWidth / 2;
 
 const startRadius = 20;   // pixel start of circles (1st ring)
 const endRadius = ((pixWidth / 2) - 20);  // pixel end of circles (last ring)
+const stepPercent = 0.5;
 
-// const white = '#ffffff';
+const white = '#ffffff';
 const grey = '#999999';
 const black = '#000000';
 
@@ -113,39 +119,45 @@ function EgoRings(props) {
   // Get list of entities qualified by time parameters
   const visibleEntities = qrManager.getEntities(state.active, state.current);
 
-  // As Time Slider may have made last selection invisible, check that it is still available
-  if (selectedEntity && state.active) {
-    let appears = false;
-    for (let i=0; i<visibleEntities.length; i++) {
-      let thisEntity = visibleEntities[i];
-      if (thisEntity === selectedEntity) {
-        appears = true;
-        break;
+  let ringScale;  // linear scale to translate tree depth to radial position
+  let tree;
+
+  if (selectedEntity !== null) {
+    let prepTree = true;
+
+    // As Time Slider may have made last selection invisible, check that it is still available
+    if (state.active) {
+      let appears = false;
+      for (let i=0; i<visibleEntities.length; i++) {
+        let thisEntity = visibleEntities[i];
+        if (thisEntity === selectedEntity) {
+          appears = true;
+          break;
+        }
+      }
+      if (!appears) {
+        setSelectedEntity(null);
+        prepTree = false;
       }
     }
-    if (!appears) {
-      setSelectedEntity(null);
+    // If an entity has been selected and is valid, create hierarchical tree centered on it
+    if (prepTree) {
+      // ringScale = scaleLinear({ domain: [1, numRings], range: [startRadius, endRadius] });
+      let eh = qrManager.getEntityHierarchy(selectedEntity, numRings, state.active, state.current);
+      console.log("Node hierarchy (pre) ", eh);
+      tree = hierarchy(eh);
+      console.log("Node hierarchy (post) ", tree);
     }
   }
 
-  let ringScale;
-  let relations = [];
-
   // Translate time values to pixels
-  const radiusAccessor = p => ringScale(p.data.pos);
+  // const radiusAccessor = p => ringScale(p.data.pos);
 
-  // If an entity has been selected, create hierarchical tree centered on it
-  if (selectedEntity !== null) {
-    ringScale = scaleLinear({ domain: [1, numRings], range: [startRadius, endRadius] });
-    let tree = qrManager.getEntityHierarchy(selectedEntity, numRings, state.active, state.current);
-    console.log("Node hierarchy ", tree);
-  }
-
-  function mouseOverRelation(event, datum) {
-    const coords = localPoint(event.target.ownerSVGElement, event);
-    const labelStr = `${datum.type}: ${datum.start} - ${datum.end}, ${datum.entity1} (${datum.role1}) and ${datum.entity2} (${datum.role2})`;
-    showTooltip({ tooltipLeft: coords.x, tooltipTop: coords.y, tooltipData: { label: labelStr } });
-  }
+  // function mouseOverRelation(event, datum) {
+  //   const coords = localPoint(event.target.ownerSVGElement, event);
+  //   const labelStr = `${datum.type}: ${datum.start} - ${datum.end}, ${datum.entity1} (${datum.role1}) and ${datum.entity2} (${datum.role2})`;
+  //   showTooltip({ tooltipLeft: coords.x, tooltipTop: coords.y, tooltipData: { label: labelStr } });
+  // }
 
   function clickEntityBtn(entity) {
     setSelectedEntity(entity);
@@ -187,6 +199,43 @@ function EgoRings(props) {
         <main className={ringClasses.graph}>
           <svg width={pixWidth} height={pixHeight}>
             <rect rx={10} width={pixWidth} height={pixHeight} fill={grey} />
+            { (selectedEntity !== null && tree !== null) && (
+              <Tree root={tree} size={[2 * Math.PI, endRadius-startRadius]}
+                separation={(a, b) => (a.parent === b.parent ? 1 : 0.5) / a.depth}
+              >
+                {data => (
+                  <Group top={centerY} left={centerX}>
+                    {data.links().map((link, i) =>
+                      <LinkRadialCurve data={link} percent={+stepPercent}
+                        stroke={black} strokeWidth="1" fill="none" key={i}
+                      />
+                     )}
+                    {data.descendants().map((node, key) => {
+                      const width = 40, height = 20;
+                      const [radialX, radialY] = pointRadial(node.x, node.y);
+                      let top = radialY;
+                      let left = radialX;
+
+                      return (
+                        <Group top={top} left={left} key={key}>
+                          {node.depth === 0 && (
+                            <circle r={12} fill={white} />
+                          )}
+                          {node.depth !== 0 && (
+                            <rect height={height} width={width} y={-height / 2} x={-width / 2}
+                              fill={black} stroke={node.data.children ? '#03c0dc' : '#26deb0'} strokeWidth={1}
+                              strokeDasharray={!node.data.children ? '2,2' : '0'}
+                              strokeOpacity={!node.data.children ? 0.6 : 1}
+                              rx={!node.data.children ? 10 : 0}
+                            />
+                          )}
+                        </Group>
+                      )
+                    })}
+                  </Group>
+                )}
+              </Tree>
+            )}
           </svg>
         </main>
       </div>
