@@ -1,3 +1,10 @@
+/***
+ * ListView -- Display entities and relationships in spreadsheet form.
+ * 
+ * TODO
+ *    Ability to click column headers to set sort order
+ */
+
 import React, { Fragment, useContext } from 'react';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';

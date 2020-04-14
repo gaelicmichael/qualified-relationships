@@ -3,10 +3,12 @@
  *      is put at center of graph, each connected entity on a ring
  *      moving outwards. User can select number of rings displayed.
  * 
- * This was initially derived from https://vx-demo.now.sh/linkTypes
+ * This viz was initially derived from https://vx-demo.now.sh/linkTypes
  *
  * TODO
- *    Create Context with reducers to simplify interaction
+ *    Select type of entity shown on button list
+ *    Color Link between entities acc to relation type, give info on hover
+ *    Create Context with reducers to simplify filtering ?
  */
 
 

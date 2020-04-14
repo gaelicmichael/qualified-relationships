@@ -3,6 +3,8 @@
  *    are displayed over time.
  * 
  * TODO
+ *    Select type of entity shown on button list
+ *    Create Context with reducers to simplify filtering ?
  */
 
 import React, { Fragment, useState, useContext } from 'react';
