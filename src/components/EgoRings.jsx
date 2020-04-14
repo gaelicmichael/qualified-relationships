@@ -3,8 +3,10 @@
  *      is put at center of graph, each connected entity on a ring
  *      moving outwards. User can select number of rings displayed.
  * 
+ * This was initially derived from https://vx-demo.now.sh/linkTypes
+ *
  * TODO
- *    All
+ *    Create Context with reducers to simplify interaction
  */
 
 
@@ -25,10 +27,9 @@ import { pointRadial } from 'd3-shape';
 
 // VX
 import { localPoint } from '@vx/event';
-import { scaleLinear } from '@vx/scale';
 import { Tree } from '@vx/hierarchy';
 import { Group } from '@vx/group';
-import { LinkRadialCurve } from '@vx/shape';
+import { LinkRadial } from '@vx/shape';
 import { withTooltip, Tooltip } from '@vx/tooltip';
 
 // App-specific components
@@ -114,12 +115,11 @@ function EgoRings(props) {
   const [state] = useContext(TimeContext);
 
   const [selectedEntity, setSelectedEntity] = useState(null);
-  const [numRings, setNumRings] = useState(3);
+  const [numRings, setNumRings] = useState(2);
 
   // Get list of entities qualified by time parameters
   const visibleEntities = qrManager.getEntities(state.active, state.current);
 
-  let ringScale;  // linear scale to translate tree depth to radial position
   let tree;
 
   if (selectedEntity !== null) {
@@ -142,22 +142,16 @@ function EgoRings(props) {
     }
     // If an entity has been selected and is valid, create hierarchical tree centered on it
     if (prepTree) {
-      // ringScale = scaleLinear({ domain: [1, numRings], range: [startRadius, endRadius] });
       let eh = qrManager.getEntityHierarchy(selectedEntity, numRings, state.active, state.current);
-      console.log("Node hierarchy (pre) ", eh);
       tree = hierarchy(eh);
-      console.log("Node hierarchy (post) ", tree);
     }
   }
 
-  // Translate time values to pixels
-  // const radiusAccessor = p => ringScale(p.data.pos);
-
-  // function mouseOverRelation(event, datum) {
-  //   const coords = localPoint(event.target.ownerSVGElement, event);
-  //   const labelStr = `${datum.type}: ${datum.start} - ${datum.end}, ${datum.entity1} (${datum.role1}) and ${datum.entity2} (${datum.role2})`;
-  //   showTooltip({ tooltipLeft: coords.x, tooltipTop: coords.y, tooltipData: { label: labelStr } });
-  // }
+  function mouseOverEntity(event, entity) {
+    const coords = localPoint(event.target.ownerSVGElement, event);
+    const labelStr = `${entity.label}: ${entity.typeLabel}, ${entity.start} - ${entity.end}`;
+    showTooltip({ tooltipLeft: coords.x, tooltipTop: coords.y, tooltipData: { label: labelStr } });
+  }
 
   function clickEntityBtn(entity) {
     setSelectedEntity(entity);
@@ -174,11 +168,10 @@ function EgoRings(props) {
       <FormControl className={ringClasses.formControl}>
         <InputLabel id="select-num-rings-label">Degrees of Separation</InputLabel>
         <Select labelId="select-num-rings-label" id="select-num-rings" value={numRings} onChange={selectNumRings}>
-          <MenuItem value={1}>One</MenuItem>
-          <MenuItem value={2}>Two</MenuItem>
-          <MenuItem value={3}>Three</MenuItem>
-          <MenuItem value={4}>Four</MenuItem>
-          <MenuItem value={5}>Five</MenuItem>
+          <MenuItem value={1}>Two</MenuItem>
+          <MenuItem value={2}>Three</MenuItem>
+          <MenuItem value={3}>Four</MenuItem>
+          <MenuItem value={4}>Five</MenuItem>
         </Select>
       </FormControl>
   
@@ -193,7 +186,7 @@ function EgoRings(props) {
                 >
                   { e.label }
                 </Button>
-              ))};
+              ))}
           </ButtonGroup>
         </div>
         <main className={ringClasses.graph}>
@@ -206,27 +199,32 @@ function EgoRings(props) {
                 {data => (
                   <Group top={centerY} left={centerX}>
                     {data.links().map((link, i) =>
-                      <LinkRadialCurve data={link} percent={+stepPercent}
+                      <LinkRadial data={link} percent={+stepPercent}
                         stroke={black} strokeWidth="1" fill="none" key={i}
                       />
                      )}
                     {data.descendants().map((node, key) => {
-                      const width = 40, height = 20;
+                      const width = 30, height = 20;
                       const [radialX, radialY] = pointRadial(node.x, node.y);
-                      let top = radialY;
-                      let left = radialX;
+                      const fullEntity = qrManager.expandEntity(node.data.entity);
+                      const strokeDash = !node.data.children ? '0' : '2,2';
+                      const rounding = !node.data.children ? 5 : 0;
 
                       return (
-                        <Group top={top} left={left} key={key}>
+                        <Group top={radialY} left={radialX} key={key}>
                           {node.depth === 0 && (
-                            <circle r={12} fill={white} />
-                          )}
+                            <circle r={12} fill={fullEntity.typeColor}
+                              stroke={white} strokeWidth={1} strokeDasharray={strokeDash}
+                              onMouseOver={(event) => mouseOverEntity(event, fullEntity)}
+                              onMouseOut={hideTooltip}    
+                            />
+                            )}
                           {node.depth !== 0 && (
                             <rect height={height} width={width} y={-height / 2} x={-width / 2}
-                              fill={black} stroke={node.data.children ? '#03c0dc' : '#26deb0'} strokeWidth={1}
-                              strokeDasharray={!node.data.children ? '2,2' : '0'}
-                              strokeOpacity={!node.data.children ? 0.6 : 1}
-                              rx={!node.data.children ? 10 : 0}
+                              fill={fullEntity.typeColor} rx={rounding}
+                              stroke={white} strokeWidth={1} strokeDasharray={strokeDash}
+                              onMouseOver={(event) => mouseOverEntity(event, fullEntity)}
+                              onMouseOut={hideTooltip}    
                             />
                           )}
                         </Group>

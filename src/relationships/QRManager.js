@@ -1,6 +1,14 @@
 /*** QR Management System
  *** Function closure that manages entities and relationships
  *** INPUT
+ ***  entityDefs: object of
+ ***    [id]: {
+ ***      label: String
+ ***      color: String
+ ***      roles: [String]
+ ***      roleColors: [String]
+ ***    }
+ ***
  ***  entities: array of
  ***    id: String
  ***    label: String
@@ -64,23 +72,37 @@ function QRManager(entityDefs, entities, relationDefs, relations) {
   }
 
   function fetchEntityLabel(id) {
-    let e = fetchEntityByID(id);
+    const e = fetchEntityByID(id);
     return e ? e.label : '';
   }
 
   function fetchExpandedRelation(thisRelation) {
-    let thisRelationDef = relationDefs[thisRelation.type];
+    const relationTypeDef = relationDefs[thisRelation.type];
 
     return {
       id: thisRelation.id,
-      type: thisRelationDef.label,
-      typeColor: thisRelationDef.color,
+      type: relationTypeDef.label,
+      typeColor: relationTypeDef.color,
       role1: thisRelation.role1,
       role2: thisRelation.role2,
       entity1: fetchEntityLabel(thisRelation.entity1),
       entity2: fetchEntityLabel(thisRelation.entity2),
       start: thisRelation.start,
       end: thisRelation.end,
+    }
+  }
+
+  function fetchExpandedEntity(thisEntity) {
+    const entityTypeDef = entityDefs[thisEntity.type];
+
+    return {
+      id: thisEntity.id,
+      label: thisEntity.label,
+      type: thisEntity.type,
+      typeLabel: entityTypeDef.label,
+      typeColor: entityTypeDef.color,
+      start: thisEntity.start,
+      end: thisEntity.end,
     }
   }
 
@@ -178,6 +200,10 @@ function QRManager(entityDefs, entities, relationDefs, relations) {
       return fetchExpandedRelation(thisRelation);
     },
 
+    expandEntity: function(thisEntity) {
+      return fetchExpandedEntity(thisEntity);
+    },
+  
     // RETURN: D3 hierarchy centered on theEntity, applying time constraints
     //        { name, entity, children: [] }
     // NOTES:  Need to recurse down to # of max depth; usedIDs maintains a list

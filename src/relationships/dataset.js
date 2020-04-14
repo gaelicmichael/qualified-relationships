@@ -10,12 +10,15 @@ export const dataTimeSettings = {
 
 export const entityDefs = {
   Person: {
+    label: 'Person',
     color: 'blue'
   },
   Band: {
+    label: 'Band',
     color: 'red'
   },
   Instrument: {
+    label: 'Instrument',
     color: 'green'
   },
 }
