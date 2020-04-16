@@ -193,7 +193,7 @@ function EgoRings(props) {
         </div>
         <main className={ringClasses.graph}>
           <svg width={pixWidth} height={pixHeight}>
-            <rect rx={10} width={pixWidth} height={pixHeight} fill={grey} />
+            <rect width={pixWidth} height={pixHeight} fill={grey} rx={8} />
             { (selectedEntity !== null && tree !== null) && (
               <Tree root={tree} size={[2 * Math.PI, endRadius-startRadius]}
                 separation={(a, b) => (a.parent === b.parent ? 1 : 0.5) / a.depth}
