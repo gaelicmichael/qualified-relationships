@@ -10,7 +10,7 @@
  ***    }
  ***
  ***  entities: array of
- ***    id: String
+ ***    id: *
  ***    label: String
  ***    type: String
  ***    start: Number
@@ -25,12 +25,12 @@
  ***    }
  ***
  ***  relations: array of
- ***    id: String
+ ***    id: *
  ***    type: String (corresponds to name of relationDef)
  ***    role1: String
  ***    role2: String
- ***    id1: String
- ***    id2: String
+ ***    entity1: *
+ ***    entity2: *
  ***    start: Number
  ***    end: Number
  ***/
@@ -81,7 +81,8 @@ function QRManager(entityDefs, entities, relationDefs, relations) {
 
     return {
       id: thisRelation.id,
-      type: relationTypeDef.label,
+      type: thisRelation.type,
+      typeLabel: relationTypeDef.label,
       typeColor: relationTypeDef.color,
       role1: thisRelation.role1,
       role2: thisRelation.role2,
@@ -90,7 +91,7 @@ function QRManager(entityDefs, entities, relationDefs, relations) {
       start: thisRelation.start,
       end: thisRelation.end,
     }
-  }
+  } // fetchExpandedRelation()
 
   function fetchExpandedEntity(thisEntity) {
     const entityTypeDef = entityDefs[thisEntity.type];
@@ -104,7 +105,21 @@ function QRManager(entityDefs, entities, relationDefs, relations) {
       start: thisEntity.start,
       end: thisEntity.end,
     }
-  }
+  } // fetchExpandedEntity()
+
+  function fetchFilteredEntities(apply, timeVal) {
+    if (!apply) {
+      return entities;
+    }
+    return entities.filter(e => (e.start <= timeVal && timeVal <= e.end));
+  } // fetchFilteredEntities()
+
+  function fetchFilteredRelations(apply, timeVal) {
+    if (!apply) {
+      return relations;
+    }
+    return relations.filter(r => (r.start <= timeVal && timeVal <= r.end));
+  } // fetchFilteredRelations()
 
   // RETURNS: Array of relations involving this entity
   function fetchRelationsFor(entityID) {
@@ -167,17 +182,11 @@ function QRManager(entityDefs, entities, relationDefs, relations) {
 
     // RETURN: array of { id, label }
     getEntities: function(apply, timeVal) {
-      if (!apply) {
-        return entities;
-      }
-      return entities.filter(e => (e.start <= timeVal && timeVal <= e.end));
+      return fetchFilteredEntities(apply, timeVal);
     }, // getEntities()
 
     getRelations: function(apply, timeVal) {
-      if (!apply) {
-        return relations;
-      }
-      return relations.filter(r => (r.start <= timeVal && timeVal <= r.end));
+      return fetchFilteredRelations(apply, timeVal);
     },
 
     getEntityRelations: function(theEntity, expand) {
@@ -214,7 +223,39 @@ function QRManager(entityDefs, entities, relationDefs, relations) {
       let tree = { name: theEntity.id, entity: theEntity, children: [] };
       growRecursiveTree(tree, usedIDs, 0, maxDepth, apply, timeVal);
       return tree;
-    }
+    },
+
+    // RETURN: A matrix used for making D3 chart
+    getMatrix: function(apply, timeVal) {
+      // Get filtered entities and relations
+      const useEntities = fetchFilteredEntities(apply, timeVal);
+      const numEntities = useEntities.length;
+      const useRelations = fetchFilteredRelations(apply, timeVal);
+      // Create square matrix for “size” of links (always 1)
+      let links = new Array(numEntities).fill(0).map(() => new Array(numEntities).fill(0));
+      // Create square matrix for index pf relation
+      let linkIndices = new Array(numEntities).fill(0).map(() => new Array(numEntities).fill(-1));
+
+      function getIndexOfEntity(id) {
+        return useEntities.findIndex(e => e.id === id);
+      }
+
+      // Iterate through relations and check each symmetric connection
+      useRelations.forEach(function(thisRelation, rI) {
+        let indexID1 = getIndexOfEntity(thisRelation.entity1);
+        let indexID2 = getIndexOfEntity(thisRelation.entity2);
+          // Only if both endpoints of relation exist according to 
+        if ((indexID1 >= 0) && (indexID2 >= 0)) {
+          links[indexID1][indexID2] = 1;
+          links[indexID2][indexID1] = 1;
+          linkIndices[indexID1][indexID2] = rI;
+          linkIndices[indexID2][indexID1] = rI;
+        }
+      });
+
+      return { matrix: links, linkIndices, entities: useEntities, relations: useRelations };
+    } // getMatrix()
+
   } // return
 
 } // QRManager()

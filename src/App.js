@@ -32,7 +32,7 @@ import { dataEntities, entityDefs, dataRelationDefs, dataRelations, dataTimeSett
 import ListView from './components/ListView.jsx';
 import EgoTimeRadar from './components/EgoTimeRadar.jsx';
 import EgoRings from './components/EgoRings.jsx';
-
+import ChordConnections from './components/ChordConnections.jsx';
 
 const drawerWidth = 170;
 
@@ -68,7 +68,8 @@ const displayModes = {
   desc: "Description",
   list: "View As List",
   egoTimeRadar: "View As Ego Time Radar",
-  egoRings: "View As Ego Rings"
+  egoRings: "View As Ego Rings",
+  chords: 'View as Chorded Ring',
 }
 
 const qrManager = QRManager(entityDefs, dataEntities, dataRelationDefs, dataRelations);
@@ -137,6 +138,9 @@ function App() {
               <ListItem button selected={displayMode === displayModes.egoRings} onClick={() => setDisplayMode(displayModes.egoRings)}>
                 <ListItemText primary={displayModes.egoRings} />
               </ListItem>
+              <ListItem button selected={displayMode === displayModes.chords} onClick={() => setDisplayMode(displayModes.chords)}>
+                <ListItemText primary={displayModes.chords} />
+              </ListItem>
             </List>
           </Drawer>
           <main className={classes.content}>
@@ -146,6 +150,7 @@ function App() {
               [displayModes.list]: <ListView inheritClasses={classes} qrManager={qrManager} />,
               [displayModes.egoTimeRadar]: <EgoTimeRadar inheritClasses={classes} qrManager={qrManager} />,
               [displayModes.egoRings]: <EgoRings inheritClasses={classes} qrManager={qrManager} />,
+              [displayModes.chords]: <ChordConnections inheritClasses={classes} qrManager={qrManager} />,
             }[displayMode]}
           </main>
         </div>
