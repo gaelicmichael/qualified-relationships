@@ -35,8 +35,9 @@ import { LinkRadial } from '@vx/shape';
 import { withTooltip, Tooltip } from '@vx/tooltip';
 
 // App-specific components
-import TimeSlider from './TimeSlider'
+import TimeSlider from './TimeSlider';
 import { TimeContext } from '../TimeConstraintsContext';
+import { SelectEntityType } from './SelectEntityType';
 
 const buttonWidth = 200;  // Pixel width of button column (with entity names)
 
@@ -116,6 +117,10 @@ function EgoRings(props) {
   const ringClasses = useStyles();
   const [state] = useContext(TimeContext);
 
+  // Get list of entity types
+  const entityTypes = qrManager.getEntityTypes();
+
+  const [selectedEntityType, setSelectedEntityType] = useState(null);
   const [selectedEntity, setSelectedEntity] = useState(null);
   const [numRings, setNumRings] = useState(2);
 
@@ -149,6 +154,10 @@ function EgoRings(props) {
     }
   }
 
+  if (selectedEntityType === null) {
+    setSelectedEntityType(entityTypes[0].label);
+  }
+
   function mouseOverEntity(event, entity) {
     const coords = localPoint(event.target.ownerSVGElement, event);
     const labelStr = `${entity.label}: ${entity.typeLabel}, ${entity.start} - ${entity.end}`;
@@ -163,32 +172,46 @@ function EgoRings(props) {
     setNumRings(event.target.value);
   }
 
+  function selectNewEntityType(event) {
+    setSelectedEntityType(event.target.value)
+  }
+
   return (
     <Fragment>
       <TimeSlider classes={inheritClasses} />
 
-      <FormControl className={ringClasses.formControl}>
-        <InputLabel id="select-num-rings-label">Degrees of Separation</InputLabel>
-        <Select labelId="select-num-rings-label" id="select-num-rings" value={numRings} onChange={selectNumRings}>
-          <MenuItem value={1}>Two</MenuItem>
-          <MenuItem value={2}>Three</MenuItem>
-          <MenuItem value={3}>Four</MenuItem>
-          <MenuItem value={4}>Five</MenuItem>
-        </Select>
-      </FormControl>
+      <div>
+        <SelectEntityType types={entityTypes} selected={selectedEntityType} onChange={selectNewEntityType} />
+
+        <FormControl className={ringClasses.formControl}>
+          <InputLabel id="select-num-rings-label">Degrees of Separation</InputLabel>
+          <Select labelId="select-num-rings-label" id="select-num-rings" value={numRings} onChange={selectNumRings}>
+            <MenuItem value={1}>Two</MenuItem>
+            <MenuItem value={2}>Three</MenuItem>
+            <MenuItem value={3}>Four</MenuItem>
+            <MenuItem value={4}>Five</MenuItem>
+          </Select>
+        </FormControl>
+      </div>
   
       <div className={ringClasses.outerWrapper}>
         <div className={ringClasses.buttonColumn}>
           <ButtonGroup orientation="vertical" color="primary" aria-label="vertical contained primary button group small"
-            variant="contained" >
-              { visibleEntities.map((e) => (
-                <Button className={ringClasses.button} key={e.id}
-                    variant={selectedEntity === e ? "outlined" : ""}
-                    onClick={() => clickEntityBtn(e)}
-                >
-                  { e.label }
-                </Button>
-              ))}
+            variant="contained"
+          >
+            { visibleEntities.map(function(e) {
+              if (e.type === selectedEntityType) {
+                return (
+                  <Button className={ringClasses.button} key={e.id}
+                      variant={selectedEntity === e ? "outlined" : ""}
+                      onClick={() => clickEntityBtn(e)}
+                  >
+                    { e.label }
+                  </Button>
+                )
+              }
+              return null;
+            })}
           </ButtonGroup>
         </div>
         <main className={ringClasses.graph}>

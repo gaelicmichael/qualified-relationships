@@ -13,6 +13,7 @@ import React, { Fragment, useState, useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
+import TextField from '@material-ui/core/TextField';
 
 // VX
 import { localPoint } from '@vx/event';
@@ -24,6 +25,7 @@ import { withTooltip, Tooltip } from '@vx/tooltip';
 // App-specific components
 import TimeSlider from './TimeSlider'
 import { TimeContext } from '../TimeConstraintsContext';
+import { SelectEntityType } from './SelectEntityType';
 
 const buttonWidth = 200;  // Pixel width of button column (with entity names)
 
@@ -40,6 +42,11 @@ const grey = '#999999';
 const black = '#000000';
 
 const useStyles = makeStyles((theme) => ({
+  selectedName: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    width: '32ch',
+  },
   outerWrapper: {
     display: 'flex',
     padding: theme.spacing(0),
@@ -95,7 +102,12 @@ function EgoTimeRadar(props) {
   const radarClasses = useStyles();
   const [state] = useContext(TimeContext);
 
+  // Get list of entity types
+  const entityTypes = qrManager.getEntityTypes();
+
+  const [selectedEntityType, setSelectedEntityType] = useState(null);
   const [selectedEntity, setSelectedEntity] = useState(null);
+  const [selectedEntityName, setSelectedEntityName] = useState('');
 
   // Get list of entities qualified by time parameters
   const visibleEntities = qrManager.getEntities(state.active, state.current);
@@ -113,6 +125,10 @@ function EgoTimeRadar(props) {
     if (!appears) {
       setSelectedEntity(null);
     }
+  }
+
+  if (selectedEntityType === null) {
+    setSelectedEntityType(entityTypes[0].label);
   }
 
   let timeScale;
@@ -138,24 +154,43 @@ function EgoTimeRadar(props) {
 
   function clickEntityBtn(entity) {
     setSelectedEntity(entity);
+    setSelectedEntityName(entity.label);
+  }
+
+  function selectNewEntityType(event) {
+    setSelectedEntityType(event.target.value);
   }
 
   return (
     <Fragment>
       <TimeSlider classes={inheritClasses} />
 
+      <div>
+        <SelectEntityType types={entityTypes} selected={selectedEntityType} onChange={selectNewEntityType} />
+        <TextField className={radarClasses.selectedName} label="Selected"
+          margin="dense" variant="outlined"
+          defaultValue={ selectedEntityName }
+        />
+      </div>
+
       <div className={radarClasses.outerWrapper}>
         <div className={radarClasses.buttonColumn}>
           <ButtonGroup orientation="vertical" color="primary" aria-label="vertical contained primary button group small"
-            variant="contained" >
-              { visibleEntities.map((e) => (
-                <Button className={radarClasses.button} key={e.id}
-                    variant={selectedEntity === e ? "outlined" : ""}
-                    onClick={() => clickEntityBtn(e)}
-                >
-                  { e.label }
-                </Button>
-              ))};
+            variant="contained"
+          >
+            { visibleEntities.map(function(e) {
+              if (e.type === selectedEntityType) {
+                return (
+                  <Button className={radarClasses.button} key={e.id}
+                      variant={selectedEntity === e ? "outlined" : ""}
+                      onClick={() => clickEntityBtn(e)}
+                  >
+                    { e.label }
+                  </Button>
+                )
+              }
+              return null;
+            })}
           </ButtonGroup>
         </div>
         <main className={radarClasses.graph}>

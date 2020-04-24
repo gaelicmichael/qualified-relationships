@@ -176,6 +176,14 @@ function QRManager(entityDefs, entities, relationDefs, relations) {
   } // growRecursiveTree()
 
   return {
+    getEntityTypes: function() {
+      let pairs = [];
+      for (let [key, subObject] of Object.entries(entityDefs)) {
+        pairs.push({ key, label: subObject.label });
+      }
+      return pairs;
+    },
+
     getEntityLabel: function(id) {
       return fetchEntityLabel(id);
     }, // getEntityLabel()
