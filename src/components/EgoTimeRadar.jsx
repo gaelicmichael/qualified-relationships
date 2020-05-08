@@ -169,7 +169,7 @@ function EgoTimeRadar(props) {
         <SelectEntityType types={entityTypes} selected={selectedEntityType} onChange={selectNewEntityType} />
         <TextField className={radarClasses.selectedName} label="Selected"
           margin="dense" variant="outlined"
-          defaultValue={ selectedEntityName }
+          value={ selectedEntityName }
         />
       </div>
 

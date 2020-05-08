@@ -22,6 +22,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import TextField from '@material-ui/core/TextField';
 
 // D3
 import { hierarchy } from 'd3-hierarchy';
@@ -122,6 +123,7 @@ function EgoRings(props) {
 
   const [selectedEntityType, setSelectedEntityType] = useState(null);
   const [selectedEntity, setSelectedEntity] = useState(null);
+  const [selectedEntityName, setSelectedEntityName] = useState('');
   const [numRings, setNumRings] = useState(2);
 
   // Get list of entities qualified by time parameters
@@ -166,6 +168,7 @@ function EgoRings(props) {
 
   function clickEntityBtn(entity) {
     setSelectedEntity(entity);
+    setSelectedEntityName(entity.label);
   }
 
   function selectNumRings(event) {
@@ -182,6 +185,10 @@ function EgoRings(props) {
 
       <div>
         <SelectEntityType types={entityTypes} selected={selectedEntityType} onChange={selectNewEntityType} />
+        <TextField className={ringClasses.selectedName} label="Selected"
+          margin="dense" variant="outlined"
+          value={ selectedEntityName }
+        />
 
         <FormControl className={ringClasses.formControl}>
           <InputLabel id="select-num-rings-label">Degrees of Separation</InputLabel>
