@@ -80,16 +80,32 @@ function descriptionText() {
       Description
     </Typography>
     <Typography paragraph>
-      This is a workbench demonstration of Qualified Relationships between entities.
-      There is a number of different kinds of defined relationships and roles in those relationships,
-      and they can also be qualified by time period.
+      This is a workbench demonstration of what I call “Qualified Relationships.”
+      Qualified Relationships recognize that connections between two entities are seldom timeless and generic,
+      but are qualified by time, types of relationships, roles within the relationship, and so on. 
+      This particular sample data set is about Progressive Rock music – individual musicians, bands, and
+      instruments – but the software is entirely generic.
     </Typography>
 
     <Typography variant="h5" gutterBottom>
       Views
     </Typography>
     <Typography paragraph>
-      The list view simply provides a simple spreadsheet-like view of the various relationships.
+      All views feature a timeline filter, which you can turn on and off.
+    </Typography>
+    <Typography paragraph>
+      View As List simply provides a simple spreadsheet-like view of the various entities and relationships.
+    </Typography>
+    <Typography paragraph>
+      In View As Ego Radar, you can select an entity on the left and a circular chart representing relationships
+      through time (moving chronologically from the center outward) will be displayed.
+    </Typography>
+    <Typography paragraph>
+      In View As Ego Rings, you can select an entity on the left and a diagram of all entities to which it is 
+      connected – up to X degrees of separation – will be displayed.
+    </Typography>
+    <Typography paragraph>
+      In View As Chorded Ring, all of the entities and all of the relationships between them are displayed at once.
     </Typography>
 
     <Typography variant="h5" gutterBottom>
