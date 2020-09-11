@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.js": "/qualified-relationships/static/js/main.24098163.chunk.js",
+    "main.js.map": "/qualified-relationships/static/js/main.24098163.chunk.js.map",
+    "runtime-main.js": "/qualified-relationships/static/js/runtime-main.18095e63.js",
+    "runtime-main.js.map": "/qualified-relationships/static/js/runtime-main.18095e63.js.map",
+    "static/js/2.c73e8e93.chunk.js": "/qualified-relationships/static/js/2.c73e8e93.chunk.js",
+    "static/js/2.c73e8e93.chunk.js.map": "/qualified-relationships/static/js/2.c73e8e93.chunk.js.map",
+    "index.html": "/qualified-relationships/index.html",
+    "precache-manifest.19e9c7a83ddc0f7fa161b1ad20c458b1.js": "/qualified-relationships/precache-manifest.19e9c7a83ddc0f7fa161b1ad20c458b1.js",
+    "service-worker.js": "/qualified-relationships/service-worker.js",
+    "static/js/2.c73e8e93.chunk.js.LICENSE.txt": "/qualified-relationships/static/js/2.c73e8e93.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.18095e63.js",
+    "static/js/2.c73e8e93.chunk.js",
+    "static/js/main.24098163.chunk.js"
+  ]
+}
